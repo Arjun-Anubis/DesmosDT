@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 
 const testFiles = [
+  'test_mobile_support.js',
   'test_ease_of_use.js',
   'test_sums_and_integrals.js',
   'test_complex_and_point_preview.js',

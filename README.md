@@ -27,7 +27,7 @@ npm test
 # Or directly:
 node tests/run_all.js
 ```
-*Executes all 16 test suites across CAS, quadrature, complex numbers, MathQuill integration, viewport rendering, ease-of-use diagnostics, and UI event flows.*
+*Executes all 17 test suites across CAS, quadrature, complex numbers, MathQuill integration, viewport rendering, mobile touch gestures, ease-of-use diagnostics, and UI event flows.*
 
 ---
 
@@ -59,6 +59,7 @@ antigrav/
 │   └── README.md                # Documentation on extension vs. standalone web app
 └── tests/                       # Automated test suites & test runner
     ├── run_all.js               # Master test runner (npm test)
+    ├── test_mobile_support.js   # Touch gestures, pinch zoom, mobile split view, responsive keypad
     ├── test_ease_of_use.js      # Error diagnostics, card reorder, inline sliders, virtual keypad
     ├── test_sums_and_integrals.js
     ├── test_complex_and_point_preview.js
@@ -115,5 +116,6 @@ antigrav/
 - **Definite Sums & Integrals**: Fast adaptive 10-point Gauss-Legendre quadrature $\int_a^b f(x)dx$ and $\sum_{n=a}^b s[n]$ with runtime convergence checks.
 - **Complex Numbers**: $z = a + bi$, polar forms, Euler identities $e^{i\pi} + 1 = 0$, complex coordinate tooltips.
 - **Symbolic CAS**: Closed-form differentiation, integration, polynomial root solving, Taylor polynomial expansion.
+- **Full Mobile & Touch Screen Support**: 1-finger panning, 2-finger pinch-to-zoom, tap-to-inspect curves & points of interest, draggable coordinates, vertical split view on phones, auto-adapting virtual keypad with iOS zoom prevention (`16px`), and notched screen safe area padding.
 - **Interactive Wrench Settings**: Radians/Degrees, dynamic axis bounds, major/minor grid visibility, square aspect ratio locks.
 - **Vector & Raster Export**: Clean SVG vector plots and high-resolution PNG image captures.

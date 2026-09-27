@@ -350,6 +350,196 @@
           this.requestRender();
         }
       });
+
+      // --- TOUCH EVENT HANDLERS (MOBILE / TABLET GESTURES) ---
+      let touchStartDist = 0;
+      let isPinchZooming = false;
+      let lastSingleTouch = null;
+      let singleTouchStart = null;
+
+      el.addEventListener('touchstart', (e) => {
+        if (!e.touches) return;
+        const rect = el.getBoundingClientRect();
+
+        if (e.touches.length === 1) {
+          isPinchZooming = false;
+          const t = e.touches[0];
+          const px = t.clientX - rect.left;
+          const py = t.clientY - rect.top;
+          this.mouseMath = this.screenToMath(px, py);
+          lastSingleTouch = { x: t.clientX, y: t.clientY };
+          singleTouchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+
+          // 1. Check draggable coordinate point (larger 24px finger target)
+          for (const item of this.expressions) {
+            if (item.visible && item.compiled && item.compiled.kind === 'point' && item.compiled.evalPoint) {
+              const ptMath = item.compiled.evalPoint();
+              if (!isNaN(ptMath.x) && !isNaN(ptMath.y)) {
+                const ptScr = this.mathToScreen(ptMath.x, ptMath.y);
+                if (Math.hypot(ptScr.x - px, ptScr.y - py) < 24) {
+                  this.isDraggingPoint = true;
+                  this.draggedPointItem = item;
+                  if (e.cancelable) e.preventDefault();
+                  return;
+                }
+              }
+            }
+          }
+
+          // 2. Check nearby curve or key point for inspection
+          this.checkHover(px, py);
+          if (this.hoveredEntity) {
+            this.isTracing = true;
+            this.tracedItem = this.hoveredEntity.item || null;
+            this.pinnedEntity = { ...this.hoveredEntity };
+            this.requestRender();
+          } else {
+            this.pinnedEntity = null;
+            this.isDragging = true;
+            this.requestRender();
+          }
+          if (e.cancelable) e.preventDefault();
+        } else if (e.touches.length === 2) {
+          // 2-finger pinch gesture
+          isPinchZooming = true;
+          this.isDragging = false;
+          this.isTracing = false;
+          this.isDraggingPoint = false;
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          if (e.cancelable) e.preventDefault();
+        }
+      }, { passive: false });
+
+      el.addEventListener('touchmove', (e) => {
+        if (!e.touches) return;
+        if (e.cancelable) e.preventDefault();
+        const rect = el.getBoundingClientRect();
+
+        if (e.touches.length === 2 && isPinchZooming) {
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const curDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          if (touchStartDist > 0 && curDist > 0) {
+            let factor = touchStartDist / curDist;
+            factor = Math.max(0.75, Math.min(1.35, factor));
+            const curCenter = {
+              x: ((t1.clientX + t2.clientX) / 2) - rect.left,
+              y: ((t1.clientY + t2.clientY) / 2) - rect.top
+            };
+            this.zoom(factor, curCenter);
+            touchStartDist = curDist;
+          }
+        } else if (e.touches.length === 1 && !isPinchZooming) {
+          const t = e.touches[0];
+          const px = t.clientX - rect.left;
+          const py = t.clientY - rect.top;
+          this.mouseMath = this.screenToMath(px, py);
+
+          if (this.isDraggingPoint && this.draggedPointItem) {
+            if (this.onPointDrag) {
+              this.onPointDrag(this.draggedPointItem, this.mouseMath.x, this.mouseMath.y);
+            }
+            this.requestRender();
+          } else if (this.isTracing && this.tracedItem) {
+            const xMath = this.mouseMath.x;
+            let yVal = this.tracedItem.compiled.eval(xMath, xMath);
+            if (!isNaN(yVal) && isFinite(yVal)) {
+              const pt = this.mathToScreen(xMath, yVal);
+              let snappedPoi = null;
+              let minPoiDist = 22;
+              for (const poi of this.keyPoints) {
+                if (poi.item === this.tracedItem) {
+                  const dist = Math.hypot(poi.px - px, poi.py - py);
+                  if (dist < minPoiDist) {
+                    minPoiDist = dist;
+                    snappedPoi = poi;
+                  }
+                }
+              }
+              if (snappedPoi) {
+                this.hoveredEntity = {
+                  type: snappedPoi.type,
+                  isPoi: true,
+                  px: snappedPoi.px,
+                  py: snappedPoi.py,
+                  xVal: snappedPoi.xVal,
+                  yVal: snappedPoi.yVal,
+                  color: snappedPoi.color,
+                  label: snappedPoi.label,
+                  item: snappedPoi.item
+                };
+              } else {
+                this.hoveredEntity = {
+                  type: 'trace',
+                  px: pt.x,
+                  py: pt.y,
+                  xVal: xMath,
+                  yVal: yVal,
+                  color: this.tracedItem.color,
+                  label: `(${this.formatVal(xMath)}, ${this.formatVal(yVal)})`,
+                  item: this.tracedItem
+                };
+              }
+              this.pinnedEntity = { ...this.hoveredEntity };
+              this.requestRender();
+            }
+          } else if (this.isDragging && lastSingleTouch) {
+            const dx = t.clientX - lastSingleTouch.x;
+            const dy = t.clientY - lastSingleTouch.y;
+            lastSingleTouch = { x: t.clientX, y: t.clientY };
+
+            const mathDx = (dx / this.width) * (this.bounds.xMax - this.bounds.xMin);
+            const mathDy = (dy / this.height) * (this.bounds.yMax - this.bounds.yMin);
+
+            this.bounds.xMin -= mathDx;
+            this.bounds.xMax -= mathDx;
+            this.bounds.yMin += mathDy;
+            this.bounds.yMax += mathDy;
+
+            this.requestRender();
+          }
+        }
+      }, { passive: false });
+
+      const handleTouchEnd = (e) => {
+        const touchCount = e.touches ? e.touches.length : 0;
+        if (touchCount === 0) {
+          if (singleTouchStart && lastSingleTouch) {
+            const moveDist = Math.hypot(lastSingleTouch.x - singleTouchStart.x, lastSingleTouch.y - singleTouchStart.y);
+            const duration = Date.now() - singleTouchStart.time;
+            if (moveDist < 8 && duration < 350) {
+              const rect = el.getBoundingClientRect();
+              const px = lastSingleTouch.x - rect.left;
+              const py = lastSingleTouch.y - rect.top;
+              this.checkHover(px, py);
+              if (this.hoveredEntity) {
+                this.pinnedEntity = { ...this.hoveredEntity };
+              } else {
+                this.pinnedEntity = null;
+                this.hoveredEntity = null;
+              }
+            }
+          }
+          this.isDragging = false;
+          this.isTracing = false;
+          this.isDraggingPoint = false;
+          this.draggedPointItem = null;
+          this.tracedItem = null;
+          isPinchZooming = false;
+          lastSingleTouch = null;
+          singleTouchStart = null;
+          this.requestRender();
+        } else if (touchCount === 1) {
+          isPinchZooming = false;
+          lastSingleTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          this.isDragging = true;
+        }
+      };
+
+      el.addEventListener('touchend', handleTouchEnd);
+      el.addEventListener('touchcancel', handleTouchEnd);
     }
 
     // --- KEY POINTS OF INTEREST & INTERSECTIONS COMPUTATION ---

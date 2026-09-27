@@ -888,6 +888,11 @@
         document.querySelectorAll('.expr-card').forEach(c => c.classList.remove('active-card'));
       }
       card.classList.add('active-card');
+      if (typeof window !== 'undefined' && (window.innerWidth <= 768 || ('ontouchstart' in window))) {
+        if (!state.keypadOpen && typeof setKeypadOpen === 'function') {
+          setKeypadOpen(true);
+        }
+      }
     });
 
     card.addEventListener('focusout', () => {
@@ -1851,31 +1856,59 @@
 
     // 16. Initialize Virtual Math Keypad
     initKeypad();
+
+    // 17. Mobile Orientation Change & Window Resize
+    if (typeof window !== 'undefined') {
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          if (graph && typeof graph.resize === 'function') graph.resize();
+        }, 150);
+      });
+    }
   }
 
   // --- VIRTUAL ON-SCREEN MATH KEYPAD ---
-  function initKeypad() {
+  function updateInputModes(keypadOpen) {
+    if (typeof document === 'undefined') return;
+    const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || window.innerWidth <= 768);
+    if (!isTouch) return;
+    const inputs = document.querySelectorAll('.mq-textarea textarea, .expr-input, .expr-fallback-input');
+    inputs.forEach(el => {
+      if (keypadOpen) {
+        el.setAttribute('inputmode', 'none');
+      } else {
+        el.removeAttribute('inputmode');
+      }
+    });
+  }
+
+  function setKeypadOpen(open) {
     const toggleBtn = document.getElementById('keypad-toggle-btn');
     const keypad = document.getElementById('virtual-keypad');
-    const closeBtn = document.getElementById('keypad-close-btn');
-    if (!keypad) return;
-
-    function setKeypadOpen(open) {
-      state.keypadOpen = open;
+    state.keypadOpen = open;
+    if (keypad) {
       if (open) {
         keypad.classList.add('open');
         if (toggleBtn) toggleBtn.classList.add('active');
-        document.body.classList.add('keypad-open');
+        if (document.body) document.body.classList.add('keypad-open');
         if (!state.activeItemId && state.items.length > 0) {
           renderSidebar(state.items[state.items.length - 1].id);
         }
       } else {
         keypad.classList.remove('open');
         if (toggleBtn) toggleBtn.classList.remove('active');
-        document.body.classList.remove('keypad-open');
+        if (document.body) document.body.classList.remove('keypad-open');
       }
-      if (graph) graph.resize();
     }
+    updateInputModes(open);
+    if (graph && typeof graph.resize === 'function') graph.resize();
+  }
+
+  function initKeypad() {
+    const toggleBtn = document.getElementById('keypad-toggle-btn');
+    const keypad = document.getElementById('virtual-keypad');
+    const closeBtn = document.getElementById('keypad-close-btn');
+    if (!keypad) return;
 
     if (toggleBtn) {
       toggleBtn.onclick = () => setKeypadOpen(!state.keypadOpen);

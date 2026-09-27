@@ -567,6 +567,7 @@ body, html {
   position: relative;
   background: #ffffff;
   cursor: crosshair;
+  touch-action: none;
 }
 
 #graph-canvas {
@@ -576,6 +577,7 @@ body, html {
   width: 100%;
   height: 100%;
   display: block;
+  touch-action: none;
 }
 
 /* Floating Top Controls on Graph */
@@ -1553,6 +1555,12 @@ body.dark-theme .mini-btn:hover {
 body.keypad-open #sidebar-scroll-area {
   padding-bottom: 280px;
 }
+body.keypad-open .floating-zoom-bar {
+  bottom: 295px;
+}
+body.keypad-open .keypad-toggle-btn {
+  bottom: 292px;
+}
 
 .keypad-header {
   height: 38px;
@@ -1672,4 +1680,269 @@ body.keypad-open #sidebar-scroll-area {
 }
 .keypad-btn.enter-key:hover {
   background: #1d4ed8;
+}
+
+/* =========================================================
+   RESPONSIVE MOBILE STYLESHEET (SMARTPHONES & TABLETS)
+   ========================================================= */
+
+/* Tablets & Mobile Screens (Portrait & Compact) */
+@media (max-width: 768px) {
+  #app-container {
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Graph container on top */
+  #graph-container {
+    width: 100%;
+    height: 42vh;
+    min-height: 180px;
+    flex: none;
+    order: 1;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  /* Expressions sidebar on bottom */
+  #sidebar {
+    width: 100% !important;
+    height: auto;
+    flex: 1;
+    min-height: 0;
+    order: 2;
+    border-right: none;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #sidebar.collapsed {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    width: 0 !important;
+    transform: none !important;
+    border-top: none;
+  }
+
+  /* When sidebar is collapsed on mobile, graph takes 100% full height */
+  #sidebar.collapsed + #graph-container {
+    height: 100% !important;
+    flex: 1 !important;
+    border-bottom: none;
+  }
+
+  /* Expand sidebar button positioned on mobile */
+  .expand-sidebar-tab {
+    top: 10px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    border-radius: 8px;
+  }
+
+  /* Floating controls on mobile */
+  .floating-top-bar {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
+  }
+
+  .glass-btn {
+    padding: 6px 10px;
+    font-size: 11.5px;
+    border-radius: 6px;
+  }
+
+  .floating-zoom-bar {
+    bottom: 12px;
+    right: 12px;
+    border-radius: 8px;
+  }
+
+  .zoom-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .keypad-toggle-btn {
+    bottom: 12px;
+    left: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  body.keypad-open .floating-zoom-bar {
+    bottom: 252px;
+  }
+
+  body.keypad-open .keypad-toggle-btn {
+    bottom: 250px;
+  }
+
+  /* Virtual Keypad Responsive Layout for Mobile */
+  #virtual-keypad {
+    height: 240px;
+    bottom: -250px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  #virtual-keypad.open {
+    bottom: 0;
+  }
+
+  body.keypad-open #sidebar-scroll-area {
+    padding-bottom: 245px;
+  }
+
+  .keypad-header {
+    height: 34px;
+    padding: 0 10px;
+  }
+
+  .keypad-tab-btn {
+    padding: 4px 8px;
+    font-size: 11.5px;
+  }
+
+  .keypad-body {
+    padding: 4px 6px;
+  }
+
+  .keypad-row {
+    gap: 3px;
+  }
+
+  .keypad-btn {
+    font-size: 12.5px;
+    min-width: 22px;
+    height: 40px;
+    padding: 0 1px;
+    border-radius: 4px;
+  }
+
+  .keypad-btn.num-key {
+    font-size: 14.5px;
+  }
+
+  /* Expression cards on mobile */
+  .expr-card {
+    padding: 6px 6px 6px 0;
+    gap: 3px;
+  }
+
+  .expr-gutter {
+    width: 34px;
+    min-width: 34px;
+  }
+
+  .expr-move-btns {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .expr-move-btn {
+    width: 18px;
+    height: 16px;
+  }
+
+  /* Prevent iOS Safari auto-zoom on input focus */
+  .expr-input,
+  .expr-fallback-input,
+  .expr-mathquill-input,
+  .mq-editable-field,
+  .mq-root-block,
+  .modal-input {
+    font-size: 16px !important;
+  }
+
+  .card-discrete-actions {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .add-slider-prompt {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px 8px;
+  }
+
+  /* Modals on Mobile */
+  .modal-card {
+    width: 94vw !important;
+    max-width: 440px !important;
+    max-height: 85vh !important;
+    margin: 10px;
+  }
+
+  .modal-body {
+    padding: 12px;
+    max-height: calc(85vh - 55px);
+    overflow-y: auto;
+  }
+
+  .setting-bounds-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .table-container {
+    max-height: 220px;
+  }
+}
+
+/* Landscape Mode on Phones (Height <= 500px) */
+@media (max-height: 500px) and (orientation: landscape) {
+  #app-container {
+    flex-direction: row;
+  }
+
+  #sidebar {
+    width: 290px !important;
+    height: 100% !important;
+    order: 1;
+    border-top: none;
+    border-right: 1px solid #e2e8f0;
+  }
+
+  #graph-container {
+    height: 100% !important;
+    flex: 1;
+    order: 2;
+    border-bottom: none;
+  }
+
+  #sidebar.collapsed {
+    display: none !important;
+  }
+
+  #virtual-keypad {
+    height: 180px;
+    bottom: -190px;
+  }
+
+  #virtual-keypad.open {
+    bottom: 0;
+  }
+
+  body.keypad-open #sidebar-scroll-area {
+    padding-bottom: 185px;
+  }
+
+  body.keypad-open .floating-zoom-bar {
+    bottom: 190px;
+  }
+
+  body.keypad-open .keypad-toggle-btn {
+    bottom: 188px;
+  }
+
+  .keypad-btn {
+    height: 30px;
+    font-size: 11.5px;
+  }
 }
