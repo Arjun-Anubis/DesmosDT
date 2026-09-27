@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniGraph - Discrete-Time & Symbolic CAS Graphing Calculator</title>
+  <link rel="stylesheet" href="css/vendor/mathquill.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="icons/icon48.png">
+</head>
+<body>
+
+  <div id="app-container">
+
+    <!-- LEFT SIDEBAR: DESMOS EXPRESSIONS PANEL -->
+    <aside id="sidebar">
+      <!-- Desmos-Style Header -->
+      <div class="desmos-header">
+        <div class="header-left">
+          <div class="dropdown-anchor">
+            <button id="desmos-plus-btn" class="desmos-plus-btn" title="Add Expression">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <div id="add-menu-dropdown" class="menu-dropdown" style="display: none;">
+              <button id="add-expr-btn" class="menu-item-btn" type="button">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19l4-14h4l4 14"/><line x1="6" y1="14" x2="14" y2="14"/></svg>
+                <span>Expression</span>
+              </button>
+              <button id="add-note-btn" class="menu-item-btn" type="button">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Note</span>
+              </button>
+              <button id="add-folder-btn" class="menu-item-btn" type="button">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>Folder</span>
+              </button>
+              <button id="add-table-btn" class="menu-item-btn" type="button">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                <span>Table</span>
+              </button>
+            </div>
+          </div>
+          <button id="desmos-undo-btn" class="desmos-nav-icon-btn" title="Undo (Ctrl+Z)">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          </button>
+          <button id="desmos-redo-btn" class="desmos-nav-icon-btn" title="Redo (Ctrl+Y)">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
+          </button>
+        </div>
+        <div class="header-right">
+          <button id="collapse-sidebar-btn" class="desmos-nav-icon-btn" title="Hide Expression List">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Expressions Area (Click anywhere below to add line) -->
+      <div class="sidebar-scroll" id="sidebar-scroll-area">
+        <div class="expr-list" id="expression-list">
+          <!-- Dynamically populated expression cards -->
+        </div>
+        <!-- Blank Dock Area: clicking creates a new row -->
+        <div class="sidebar-blank-dock" id="sidebar-blank-dock" title="Click to add a line">
+          <div class="expr-gutter blank-dock-gutter">
+            <span class="expr-index faint-next-index">2</span>
+          </div>
+          <div class="blank-dock-body"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT: CARTESIAN GRAPHPAPER CANVAS AREA -->
+    <main id="graph-container">
+      <button id="expand-sidebar-btn" class="expand-sidebar-tab" title="Show Expression List" style="display:none;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <canvas id="graph-canvas"></canvas>
+
+      <!-- Floating Top Action Bar: Clean & Minimalist Desmos Header -->
+      <div class="floating-top-bar">
+        <!-- Share & Export Menu Dropdown -->
+        <div class="dropdown-anchor">
+          <button id="share-menu-toggle" class="glass-btn" title="Share &amp; Export">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Export &amp; Share</span>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="share-menu-dropdown" class="menu-dropdown" style="display: none;">
+            <button id="export-png-btn" class="menu-item-btn" title="Export High-Res PNG">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Export PNG Image</span>
+            </button>
+            <button id="export-svg-btn" class="menu-item-btn" title="Export Scalable Vector SVG">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              <span>Export Vector SVG</span>
+            </button>
+            <button id="share-graph-btn" class="menu-item-btn" title="Copy Shareable Permalink">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>Copy Shareable Link</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Graph Settings Button -->
+        <button id="wrench-btn" class="glass-btn" title="Graph Settings (Grid, Axes, Radians, Bounds, Theme)">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </div>
+
+      <!-- Floating Bottom Zoom Controls (Desmos Style) -->
+      <div class="floating-zoom-bar">
+        <button id="zoom-in-btn" class="zoom-btn" title="Zoom In">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button id="zoom-out-btn" class="zoom-btn" title="Zoom Out">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button id="home-view-btn" class="zoom-btn" title="Default View">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </button>
+      </div>
+
+      <!-- Floating Bottom Keypad Toggle (Desmos Style) -->
+      <button id="keypad-toggle-btn" class="keypad-toggle-btn" title="Toggle On-Screen Math Keypad">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="10" y1="12" x2="10.01" y2="12"/><line x1="14" y1="12" x2="14.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/>
+        </svg>
+        <span>Keypad</span>
+      </button>
+    </main>
+
+  </div>
+
+  <!-- VIRTUAL ON-SCREEN MATH KEYPAD -->
+  <div id="virtual-keypad">
+    <div class="keypad-header">
+      <div class="keypad-tabs">
+        <button type="button" class="keypad-tab-btn active" data-tab="main">123</button>
+        <button type="button" class="keypad-tab-btn" data-tab="functions">f(x)</button>
+        <button type="button" class="keypad-tab-btn" data-tab="dsp">DSP Signals</button>
+      </div>
+      <button type="button" id="keypad-close-btn" class="keypad-close-btn" title="Hide Keypad">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+    <div class="keypad-body">
+      <!-- Tab 1: 123 Main Keypad -->
+      <div class="keypad-panel active" id="keypad-panel-main">
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="x">x</button>
+          <button type="button" class="keypad-btn op-key" data-write="y">y</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="^2">x^2</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="^">a^b</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="\sqrt">sqrt</button>
+          <button type="button" class="keypad-btn op-key" data-write="(">(</button>
+          <button type="button" class="keypad-btn op-key" data-write=")">)</button>
+          <button type="button" class="keypad-btn num-key" data-write="7">7</button>
+          <button type="button" class="keypad-btn num-key" data-write="8">8</button>
+          <button type="button" class="keypad-btn num-key" data-write="9">9</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="/">/</button>
+          <button type="button" class="keypad-btn action-key" data-action="backspace">Del</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="<">&lt;</button>
+          <button type="button" class="keypad-btn op-key" data-write=">">&gt;</button>
+          <button type="button" class="keypad-btn op-key" data-write="\le">&lt;=</button>
+          <button type="button" class="keypad-btn op-key" data-write="\ge">&gt;=</button>
+          <button type="button" class="keypad-btn op-key" data-write="\pi">pi</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="|">|x|</button>
+          <button type="button" class="keypad-btn op-key" data-write=",">,</button>
+          <button type="button" class="keypad-btn num-key" data-write="4">4</button>
+          <button type="button" class="keypad-btn num-key" data-write="5">5</button>
+          <button type="button" class="keypad-btn num-key" data-write="6">6</button>
+          <button type="button" class="keypad-btn op-key" data-write="*">*</button>
+          <button type="button" class="keypad-btn action-key" data-action="left">Left</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="n">n</button>
+          <button type="button" class="keypad-btn op-key" data-write="e">e</button>
+          <button type="button" class="keypad-btn op-key" data-write="i">i</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="\sum">sum</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="\int">int</button>
+          <button type="button" class="keypad-btn op-key" data-write="=">=</button>
+          <button type="button" class="keypad-btn num-key" data-write="1">1</button>
+          <button type="button" class="keypad-btn num-key" data-write="2">2</button>
+          <button type="button" class="keypad-btn num-key" data-write="3">3</button>
+          <button type="button" class="keypad-btn op-key" data-write="-">-</button>
+          <button type="button" class="keypad-btn action-key" data-action="right">Right</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="[" style="flex:1;">[</button>
+          <button type="button" class="keypad-btn op-key" data-write="]" style="flex:1;">]</button>
+          <button type="button" class="keypad-btn num-key" data-write="0" style="flex:2;">0</button>
+          <button type="button" class="keypad-btn num-key" data-write="." style="flex:1;">.</button>
+          <button type="button" class="keypad-btn op-key" data-write="+" style="flex:2;">+</button>
+          <button type="button" class="keypad-btn enter-key" data-action="enter" style="flex:3;">Enter</button>
+        </div>
+      </div>
+
+      <!-- Tab 2: f(x) Functions Keypad -->
+      <div class="keypad-panel" id="keypad-panel-functions">
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="\sin(">sin</button>
+          <button type="button" class="keypad-btn op-key" data-write="\cos(">cos</button>
+          <button type="button" class="keypad-btn op-key" data-write="\tan(">tan</button>
+          <button type="button" class="keypad-btn op-key" data-write="\arcsin(">arcsin</button>
+          <button type="button" class="keypad-btn op-key" data-write="\arccos(">arccos</button>
+          <button type="button" class="keypad-btn op-key" data-write="\arctan(">arctan</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="\sinh(">sinh</button>
+          <button type="button" class="keypad-btn op-key" data-write="\cosh(">cosh</button>
+          <button type="button" class="keypad-btn op-key" data-write="\tanh(">tanh</button>
+          <button type="button" class="keypad-btn op-key" data-write="\ln(">ln</button>
+          <button type="button" class="keypad-btn op-key" data-write="\log(">log</button>
+          <button type="button" class="keypad-btn op-key" data-write="\exp(">exp</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-cmd="\sqrt">sqrt(x)</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="\nthroot">root(x)</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{floor}(">floor</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{ceil}(">ceil</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{round}(">round</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{sign}(">sign</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-cmd="\frac{d}{dx}">d/dx</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="\int">int</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="\sum">sum</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{re}(">Re(z)</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{im}(">Im(z)</button>
+          <button type="button" class="keypad-btn enter-key" data-action="enter">Enter</button>
+        </div>
+      </div>
+
+      <!-- Tab 3: DSP Discrete Signals Keypad -->
+      <div class="keypad-panel" id="keypad-panel-dsp">
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="n">n</button>
+          <button type="button" class="keypad-btn op-key" data-write="k">k</button>
+          <button type="button" class="keypad-btn op-key" data-write="\omega">omega</button>
+          <button type="button" class="keypad-btn op-key" data-write="\delta[n]">delta[n]</button>
+          <button type="button" class="keypad-btn op-key" data-write="u[n]">u[n]</button>
+          <button type="button" class="keypad-btn op-key" data-write="r[n]">r[n]</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{rect}[n, 2]">rect[n, 2]</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{sinc}[n]">sinc[n]</button>
+          <button type="button" class="keypad-btn op-key" data-write="s_1[n]">s1[n]</button>
+          <button type="button" class="keypad-btn op-key" data-write="s_2[n]">s2[n]</button>
+          <button type="button" class="keypad-btn op-key" data-write="*">* (conv)</button>
+          <button type="button" class="keypad-btn op-key" data-cmd="\sum">sum</button>
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn op-key" data-write="e^{j\omega n}">e^(j omega n)</button>
+          <button type="button" class="keypad-btn op-key" data-write="z^{-1}">z^-1</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{mag}(">|X|</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{phase}(">phase(X)</button>
+          <button type="button" class="keypad-btn op-key" data-write="\operatorname{conj}(">conj</button>
+          <button type="button" class="keypad-btn enter-key" data-action="enter">Enter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTOCOMPLETE CAS SUGGESTIONS DROPDOWN -->
+  <div id="cas-suggestions-popover" class="suggestions-popover" style="display:none;"></div>
+
+  <!-- SIGNAL DATA TABLE MODAL -->
+  <div class="modal-overlay" id="table-modal">
+    <div class="modal-card" style="width: 440px;">
+      <div class="modal-header">
+        <h3 id="table-modal-title">Discrete Signal Samples (n, x[n])</h3>
+        <button id="close-table-btn" class="desmos-nav-icon-btn" title="Close">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-actions-bar">
+          <button id="copy-csv-btn" class="mini-btn">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy CSV</span>
+          </button>
+          <button id="copy-numpy-btn" class="mini-btn">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Copy NumPy</span>
+          </button>
+          <button id="copy-matlab-btn" class="mini-btn">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Copy MATLAB</span>
+          </button>
+        </div>
+        <div class="table-scroll-box" id="table-data-content">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DTFT FREQUENCY SPECTRUM MODAL -->
+  <div class="modal-overlay" id="dtft-modal">
+    <div class="modal-card" style="width: 540px;">
+      <div class="modal-header">
+        <h3 id="dtft-modal-title">DTFT Spectrum |X(e^(jω))|</h3>
+        <button id="close-dtft-btn" class="desmos-nav-icon-btn" title="Close">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <canvas id="dtft-canvas" width="500" height="220" style="width:100%; height:220px; background:#f8fafc; border-radius:8px; border:1px solid #cbd5e1;"></canvas>
+        <div class="dtft-metrics-row" id="dtft-metrics-info">
+          <!-- Energy & Power info -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAPH SETTINGS / WRENCH MODAL (DESMOS STYLE) -->
+  <div class="modal-overlay" id="wrench-modal">
+    <div class="modal-card" style="width: 380px;">
+      <div class="modal-header">
+        <h3>Graph Settings</h3>
+        <button id="close-wrench-btn" class="desmos-nav-icon-btn" title="Close">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-toggle-group">
+          <label class="setting-checkbox-label">
+            <input type="checkbox" id="setting-grid" checked>
+            <span>Major Grid Lines</span>
+          </label>
+          <label class="setting-checkbox-label">
+            <input type="checkbox" id="setting-subgrid" checked>
+            <span>Minor Sub-Grid Lines</span>
+          </label>
+          <label class="setting-checkbox-label">
+            <input type="checkbox" id="setting-axes" checked>
+            <span>Axes</span>
+          </label>
+          <label class="setting-checkbox-label">
+            <input type="checkbox" id="setting-labels" checked>
+            <span>Numbers &amp; Coordinates</span>
+          </label>
+          <label class="setting-checkbox-label">
+            <input type="checkbox" id="setting-aspect">
+            <span>Lock Square Aspect Ratio (1:1)</span>
+          </label>
+        </div>
+
+        <div class="modal-row" style="margin-top: 6px;">
+          <label>Angle Units:</label>
+          <div class="angle-btn-group">
+            <button type="button" id="angle-rad-btn" class="angle-opt active">Radians</button>
+            <button type="button" id="angle-deg-btn" class="angle-opt">Degrees</button>
+          </div>
+        </div>
+
+        <div class="modal-row" style="margin-top: 6px;">
+          <label>Axis Labels:</label>
+          <div class="bounds-input-row">
+            <input type="text" id="setting-xlabel" class="modal-input" placeholder="X-Axis (e.g. n or t)" value="x">
+            <input type="text" id="setting-ylabel" class="modal-input" placeholder="Y-Axis (e.g. x[n] or y)" value="y">
+          </div>
+        </div>
+
+        <div class="modal-row" style="margin-top: 6px;">
+          <label>X-Axis Bounds:</label>
+          <div class="bounds-input-row">
+            <input type="number" id="bound-xmin" class="modal-input" step="any" placeholder="X Min">
+            <span>to</span>
+            <input type="number" id="bound-xmax" class="modal-input" step="any" placeholder="X Max">
+          </div>
+        </div>
+
+        <div class="modal-row">
+          <label>Y-Axis Bounds:</label>
+          <div class="bounds-input-row">
+            <input type="number" id="bound-ymin" class="modal-input" step="any" placeholder="Y Min">
+            <span>to</span>
+            <input type="number" id="bound-ymax" class="modal-input" step="any" placeholder="Y Max">
+          </div>
+        </div>
+
+        <button id="apply-wrench-btn" class="modal-btn primary">Apply &amp; Update Graph</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/vendor/jquery.min.js"></script>
+  <script src="js/vendor/mathquill.min.js"></script>
+  <!-- Modular Mathematical Engine -->
+  <script src="js/math/complex.js"></script>
+  <script src="js/math/quadrature.js"></script>
+  <script src="js/math/cas_parser.js"></script>
+  <script src="js/math/cas_algebra.js"></script>
+  <script src="js/math/latex_converter.js"></script>
+  <script src="js/math/transpiler.js"></script>
+  <script src="js/math/compiler.js"></script>
+  <script src="js/math/dsp.js"></script>
+  <script src="js/math/suggestions.js"></script>
+  <script src="js/cas_math.js"></script>
+  <script src="js/graphpaper.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,538 @@
+/* ========================================================
+   DesmosDT - Clean Desmos-Styled CSS
+   ======================================================== */
+
+/* Canvas Overlay directly above Desmos Graph */
+.desmos-dt-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+/* Floating Trigger Button (Top-Right / Header Dock) */
+.desmos-dt-trigger-btn {
+  position: fixed;
+  top: 14px;
+  right: 180px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #2d70b3;
+  border: 1.5px solid #2d70b3;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.desmos-dt-trigger-btn:hover {
+  background: #2d70b3;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(45, 112, 179, 0.3);
+  transform: translateY(-1px);
+}
+
+.desmos-dt-trigger-btn.active {
+  background: #2d70b3;
+  color: #ffffff;
+}
+
+/* Main Control Panel */
+.desmos-dt-panel {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  width: 380px;
+  max-height: calc(100vh - 85px);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.15), 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+  z-index: 99998;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  animation: dtSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dtSlideIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Panel Header */
+.desmos-dt-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #eef0f3;
+  background: #ffffff;
+}
+
+.desmos-dt-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.desmos-dt-badge {
+  background: #2d70b3;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.desmos-dt-panel-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.desmos-dt-icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #9ca3af;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 8px;
+  transition: all 0.15s ease;
+}
+
+.desmos-dt-icon-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Tabs Navigation */
+.desmos-dt-tabs {
+  display: flex;
+  border-bottom: 1px solid #eef0f3;
+  background: #f9fafb;
+}
+
+.desmos-dt-tab {
+  flex: 1;
+  padding: 10px 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.desmos-dt-tab:hover {
+  color: #2d70b3;
+}
+
+.desmos-dt-tab.active {
+  color: #2d70b3;
+  border-bottom-color: #2d70b3;
+  background: #ffffff;
+}
+
+/* Body Container */
+.desmos-dt-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: 520px;
+}
+
+/* Buttons */
+.desmos-dt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.desmos-dt-btn.primary {
+  background: #2d70b3;
+  color: #ffffff;
+}
+.desmos-dt-btn.primary:hover {
+  background: #23588d;
+}
+
+.desmos-dt-btn.secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+.desmos-dt-btn.secondary:hover {
+  background: #e5e7eb;
+}
+
+.desmos-dt-btn-sm {
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  transition: all 0.15s ease;
+}
+.desmos-dt-btn-sm:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+.desmos-dt-btn-sm.primary {
+  background: #2d70b3;
+  color: #ffffff;
+  border: none;
+}
+.desmos-dt-btn-sm.primary:hover {
+  background: #23588d;
+}
+
+/* Section Bar */
+.desmos-dt-section-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.desmos-dt-section-bar button {
+  flex: 1;
+}
+
+/* Signal Card */
+.desmos-dt-sig-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.15s ease;
+}
+
+.desmos-dt-sig-card:hover {
+  border-color: #c7d2fe;
+}
+
+.desmos-dt-sig-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.desmos-dt-sig-enable {
+  cursor: pointer;
+  accent-color: #2d70b3;
+  width: 16px;
+  height: 16px;
+}
+
+.desmos-dt-sig-name {
+  flex: 1;
+  border: none;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #111827;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.desmos-dt-sig-name:focus {
+  outline: 1.5px solid #2d70b3;
+  background: #f8fafc;
+}
+
+.desmos-dt-sig-del {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.desmos-dt-sig-del:hover {
+  opacity: 1;
+}
+
+/* Form Rows & Inputs */
+.desmos-dt-row {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.desmos-dt-row label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.desmos-dt-row input[type="text"],
+.desmos-dt-row input[type="number"],
+.desmos-dt-row select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: #1f2937;
+  background: #ffffff;
+  transition: border-color 0.15s ease;
+}
+
+.desmos-dt-row input:focus,
+.desmos-dt-row select:focus {
+  outline: none;
+  border-color: #2d70b3;
+  box-shadow: 0 0 0 2px rgba(45, 112, 179, 0.15);
+}
+
+.desmos-dt-row.checkbox-row {
+  flex-direction: row;
+  align-items: center;
+}
+.desmos-dt-row.checkbox-row label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1d4ed8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.desmos-dt-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.desmos-dt-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.desmos-dt-row-3 label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+}
+.desmos-dt-row-3 input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 11.5px;
+}
+
+/* Recurrence box */
+.desmos-dt-recurrence-box {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+/* Style Box */
+.desmos-dt-style-box {
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.desmos-dt-style-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.desmos-dt-style-grid label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 4px;
+  display: block;
+}
+.desmos-dt-style-grid select {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 11.5px;
+}
+
+/* Color Picker & Presets */
+.desmos-dt-color-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.desmos-dt-color-input {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+}
+.desmos-dt-color-preset {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.desmos-dt-color-preset:hover {
+  transform: scale(1.2);
+}
+
+/* Range input */
+.desmos-dt-sig-width {
+  width: 100%;
+  cursor: pointer;
+  accent-color: #2d70b3;
+}
+
+.val-label {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.desmos-dt-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* CAS Tab */
+.desmos-dt-info {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 0;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.desmos-dt-cas-result-card {
+  margin-top: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+.desmos-dt-cas-result-card label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 4px;
+  display: block;
+}
+.desmos-cas-output {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px;
+  word-break: break-all;
+  margin-bottom: 8px;
+}
+
+/* Presets Tab */
+.desmos-dt-preset-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: #ffffff;
+}
+.desmos-dt-preset-item strong {
+  font-size: 12.5px;
+  color: #1f2937;
+  display: block;
+}
+.desmos-dt-preset-item p {
+  font-size: 11px;
+  color: #6b7280;
+  margin: 2px 0 0 0;
+  font-family: monospace;
+}
+
+.desmos-dt-help-list {
+  padding-left: 18px;
+  margin: 6px 0;
+  font-size: 11.5px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+.desmos-dt-help-list code {
+  background: #f3f4f6;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Toast */
+.desmos-dt-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(50px);
+  background: #1f2937;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 999999;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.desmos-dt-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}

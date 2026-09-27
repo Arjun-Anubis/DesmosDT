@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DesmosDT - Interactive Simulator & Verification Testbed</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+    }
+    #desmos-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    /* Simulated Desmos Sidebar */
+    #mock-sidebar {
+      width: 320px;
+      height: 100%;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      z-index: 5;
+    }
+    .sidebar-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+    }
+    .desmos-logo {
+      font-size: 16px;
+      font-weight: 800;
+      color: #2d70b3;
+      letter-spacing: -0.5px;
+    }
+    .mock-expr-list {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+    }
+    .mock-expr-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+      color: #1e293b;
+      word-break: break-all;
+    }
+    /* Simulated Graphpaper Container */
+    .dcg-graph-outer {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: #ffffff;
+      cursor: crosshair;
+      user-select: none;
+    }
+    #mock-grid-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .graph-hint {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #64748b;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      z-index: 2;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="desmos-container">
+    <!-- Mock Desmos Left Sidebar -->
+    <div id="mock-sidebar">
+      <div class="sidebar-header">
+        <span class="desmos-logo">desmos <span style="font-size:11px; color:#64748b; font-weight:500;">(Simulator)</span></span>
+        <span style="font-size:12px; color:#059669; font-weight:600;">DT+ Active</span>
+      </div>
+      <div class="mock-expr-list" id="mock-expr-list">
+        <div style="color:#94a3b8; font-size:12px; text-align:center; padding: 20px 0;">
+          Baked expressions &amp; CAS plots will appear here.
+        </div>
+      </div>
+    </div>
+
+    <!-- Mock Desmos Graphpaper Area -->
+    <div class="dcg-graph-outer" id="graph-outer">
+      <canvas id="mock-grid-canvas"></canvas>
+      <div class="graph-hint">💡 Drag to Pan • Scroll Wheel to Zoom • Click Top-Right Button to Open DesmosDT</div>
+    </div>
+  </div>
+
+  <!-- Mock Desmos Calc API -->
+  <script>
+    (function() {
+      const outer = document.getElementById('graph-outer');
+      const gridCanvas = document.getElementById('mock-grid-canvas');
+      const ctx = gridCanvas.getContext('2d');
+      const exprList = document.getElementById('mock-expr-list');
+
+      // Math bounds: standard Desmos default [-10, 10]
+      const bounds = {
+        left: -8,
+        right: 18,
+        bottom: -4,
+        top: 6
+      };
+
+      const observers = {
+        graphpaperBounds: []
+      };
+
+      window.Calc = {
+        graphpaperBounds: {
+          mathCoordinates: bounds
+        },
+        observe: function(event, callback) {
+          if (observers[event]) observers[event].push(callback);
+        },
+        setExpression: function(expr) {
+          console.log('[Mock Calc] setExpression:', expr);
+          const div = document.createElement('div');
+          div.className = 'mock-expr-item';
+          div.innerHTML = `
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:${expr.color || '#2d70b3'}; display:inline-block;"></span>
+              <strong>${expr.id}</strong>
+            </div>
+            <div>${expr.latex}</div>
+          `;
+          exprList.appendChild(div);
+        }
+      };
+
+      function notifyBounds() {
+        observers.graphpaperBounds.forEach(cb => cb());
+      }
+
+      function drawGrid() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = outer.getBoundingClientRect();
+        gridCanvas.width = rect.width * dpr;
+        gridCanvas.height = rect.height * dpr;
+        gridCanvas.style.width = `${rect.width}px`;
+        gridCanvas.style.height = `${rect.height}px`;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+
+        ctx.clearRect(0, 0, rect.width, rect.height);
+
+        const w = rect.width;
+        const h = rect.height;
+
+        function toPx(x, y) {
+          return {
+            x: ((x - bounds.left) / (bounds.right - bounds.left)) * w,
+            y: ((bounds.top - y) / (bounds.top - bounds.bottom)) * h
+          };
+        }
+
+        // Draw sub-grid lines
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#f1f5f9';
+        for (let x = Math.floor(bounds.left); x <= Math.ceil(bounds.right); x++) {
+          const pt = toPx(x, 0);
+          ctx.beginPath();
+          ctx.moveTo(pt.x, 0);
+          ctx.lineTo(pt.x, h);
+          ctx.stroke();
+        }
+        for (let y = Math.floor(bounds.bottom); y <= Math.ceil(bounds.top); y++) {
+          const pt = toPx(0, y);
+          ctx.beginPath();
+          ctx.moveTo(0, pt.y);
+          ctx.lineTo(w, pt.y);
+          ctx.stroke();
+        }
+
+        // Major Axes
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.5;
+        const origin = toPx(0, 0);
+
+        // X Axis
+        ctx.beginPath();
+        ctx.moveTo(0, origin.y);
+        ctx.lineTo(w, origin.y);
+        ctx.stroke();
+
+        // Y Axis
+        ctx.beginPath();
+        ctx.moveTo(origin.x, 0);
+        ctx.lineTo(origin.x, h);
+        ctx.stroke();
+
+        // Axis numbers
+        ctx.font = '11px sans-serif';
+        ctx.fillStyle = '#64748b';
+        ctx.textAlign = 'center';
+        for (let x = Math.floor(bounds.left); x <= Math.ceil(bounds.right); x++) {
+          if (x === 0) continue;
+          const pt = toPx(x, 0);
+          ctx.fillText(x, pt.x, origin.y + 14);
+        }
+        ctx.textAlign = 'right';
+        for (let y = Math.floor(bounds.bottom); y <= Math.ceil(bounds.top); y++) {
+          if (y === 0) continue;
+          const pt = toPx(0, y);
+          ctx.fillText(y, origin.x - 6, pt.y + 4);
+        }
+      }
+
+      window.addEventListener('resize', () => {
+        drawGrid();
+        notifyBounds();
+      });
+
+      // Pan & Zoom
+      let isDragging = false;
+      let startX, startY;
+      let startLeft, startRight, startTop, startBottom;
+
+      outer.addEventListener('mousedown', (e) => {
+        if (e.target.id === 'desmos-dt-overlay') {
+          // allow interaction
+        }
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = bounds.left;
+        startRight = bounds.right;
+        startTop = bounds.top;
+        startBottom = bounds.bottom;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const rect = outer.getBoundingClientRect();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        const xSpan = startRight - startLeft;
+        const ySpan = startTop - startBottom;
+
+        const mathDx = (dx / rect.width) * xSpan;
+        const mathDy = (dy / rect.height) * ySpan;
+
+        bounds.left = startLeft - mathDx;
+        bounds.right = startRight - mathDx;
+        bounds.top = startTop + mathDy;
+        bounds.bottom = startBottom + mathDy;
+
+        drawGrid();
+        notifyBounds();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      outer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = outer.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const mouseMathX = bounds.left + (mouseX / rect.width) * (bounds.right - bounds.left);
+        const mouseMathY = bounds.top - (mouseY / rect.height) * (bounds.top - bounds.bottom);
+
+        const zoomFactor = e.deltaY < 0 ? 0.9 : 1.1;
+
+        bounds.left = mouseMathX + (bounds.left - mouseMathX) * zoomFactor;
+        bounds.right = mouseMathX + (bounds.right - mouseMathX) * zoomFactor;
+        bounds.top = mouseMathY + (bounds.top - mouseMathY) * zoomFactor;
+        bounds.bottom = mouseMathY + (bounds.bottom - mouseMathY) * zoomFactor;
+
+        drawGrid();
+        notifyBounds();
+      }, { passive: false });
+
+      setTimeout(drawGrid, 50);
+    })();
+  </script>
+
+  <!-- Load DesmosDT runtime directly into simulator -->
+  <script src="../injected.js"></script>
+
+</body>
+</html>

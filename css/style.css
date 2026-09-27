@@ -1,0 +1,1675 @@
+/* =========================================================
+   OmniGraph - Desmos Authentic Aesthetic & Clean Layout
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1e293b;
+  background: #f8fafc;
+  user-select: none;
+}
+
+/* App Container */
+#app-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* =========================================================
+   LEFT SIDEBAR (EXPRESSIONS LIST - DESMOS STYLE)
+   ========================================================= */
+#sidebar {
+  width: 410px;
+  height: 100%;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+  z-index: 100;
+  position: relative;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#sidebar.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  transform: translateX(-100%);
+  border-right: none;
+  overflow: hidden;
+}
+
+.expand-sidebar-tab {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 120;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: all 0.15s ease;
+}
+.expand-sidebar-tab:hover {
+  background: #2d70b3;
+  color: #ffffff;
+  border-color: #2d70b3;
+}
+
+/* Desmos Sidebar Top Header */
+.desmos-header {
+  padding: 8px 12px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Desmos Iconic Round "+" Button */
+.desmos-plus-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #334155;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: all 0.15s ease;
+}
+.desmos-plus-btn:hover {
+  background: #f1f5f9;
+  border-color: #2d70b3;
+  color: #2d70b3;
+  transform: scale(1.05);
+}
+
+.desmos-nav-icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #64748b;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+.desmos-nav-icon-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Sidebar Scroll Area */
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.expr-list {
+  padding: 8px 10px 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Desmos Expression Card */
+.expr-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.expr-card.active-card,
+.expr-card:focus-within {
+  border-color: #2d70b3 !important;
+  box-shadow: 0 0 0 1px #2d70b3 !important;
+}
+
+.expr-card.hidden-item {
+  opacity: 0.6;
+}
+
+.expr-main-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 52px;
+}
+
+/* Left Gutter with Row Index */
+.expr-gutter {
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-right: 1px solid #f1f5f9;
+  flex-shrink: 0;
+  user-select: none;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.expr-index {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.expr-card.active-card .expr-gutter,
+.expr-card:focus-within .expr-gutter {
+  background: #2d70b3 !important;
+  border-right-color: #2d70b3 !important;
+}
+.expr-card.active-card .expr-index,
+.expr-card:focus-within .expr-index {
+  color: #ffffff !important;
+}
+
+/* Row Content Area */
+.expr-content-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Swatch Wrapper & Desmos Curve Wave Icon */
+.expr-swatch-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expr-swatch-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--swatch-color);
+  background: var(--swatch-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+}
+.expr-swatch-btn:hover {
+  transform: scale(1.12);
+}
+.expr-swatch-btn.hidden {
+  background: #ffffff !important;
+}
+.expr-swatch-btn.hidden .desmos-curve-icon path {
+  stroke: var(--swatch-color) !important;
+}
+
+/* Empty Swatch Placeholder: NO CIRCLE WHEN EMPTY! */
+.expr-swatch-placeholder {
+  width: 26px;
+  height: 26px;
+}
+
+/* MathQuill & Input */
+.expr-input-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.expr-mathquill-input {
+  width: 100%;
+}
+.mq-editable-field {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-size: 19px !important;
+  color: #0f172a !important;
+  padding: 4px 0 !important;
+  width: 100% !important;
+  min-height: 32px !important;
+  line-height: 1.15 !important;
+  outline: none !important;
+}
+.mq-editable-field.mq-focused {
+  border: none !important;
+  box-shadow: none !important;
+}
+.mq-cursor {
+  border-left: 2px solid #2d70b3 !important;
+}
+
+/* Crisp, Non-Broken Bracket Visuals (Square Brackets, Parentheses, Curly Braces) */
+.mq-math-mode * {
+  line-height: 1 !important;
+}
+.mq-math-mode .mq-paren {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cambria Math", "Times New Roman", sans-serif !important;
+  font-style: normal !important;
+  font-weight: 300 !important;
+  line-height: 1 !important;
+  padding: 0 1.5px !important;
+  vertical-align: -0.05em !important;
+  transform-origin: center center !important;
+}
+/* Ensure standard single-line brackets (e.g. s[n], (x)) are not stretched awkwardly */
+.mq-math-mode .mq-non-leaf:not(:has(.mq-fraction)):not(:has(.mq-array)) > .mq-paren {
+  transform: none !important;
+  vertical-align: 0 !important;
+  font-size: 1.05em !important;
+}
+
+.expr-fallback-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cambria Math", "Times New Roman", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  padding: 4px 0;
+}
+
+.badge-dt {
+  font-size: 9.5px;
+  font-weight: 800;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+.badge-complex {
+  font-size: 10px;
+  font-weight: 800;
+  background: #fdf4ff;
+  color: #9333ea;
+  border: 1px solid #f0abfc;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+/* Card Tools */
+.expr-card-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+.expr-card:hover .expr-card-tools,
+.expr-card:focus-within .expr-card-tools {
+  opacity: 1;
+}
+
+.expr-gear-btn,
+.expr-dup-btn,
+.expr-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 5px;
+  color: #94a3b8;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+.expr-gear-btn:hover {
+  color: #2d70b3;
+  background: #eff6ff;
+}
+.expr-dup-btn:hover {
+  color: #2d70b3;
+  background: #eff6ff;
+}
+.expr-delete-btn:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+/* Slider Bar */
+.expr-slider-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 10px 8px 44px;
+  padding-top: 6px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.slider-play-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  border-radius: 5px;
+  padding: 4px 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.slider-play-btn:hover {
+  background: #e2e8f0;
+  color: #2d70b3;
+  border-color: #94a3b8;
+}
+
+.slider-range {
+  flex: 1;
+  accent-color: #2d70b3;
+  cursor: pointer;
+}
+
+.slider-val-display {
+  font-family: monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #475569;
+  width: 42px;
+  text-align: right;
+}
+
+/* Blank Dock at Bottom */
+.sidebar-blank-dock {
+  margin: 4px 10px 18px 10px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 6px;
+  min-height: 48px;
+  background: #ffffff;
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.sidebar-blank-dock:hover {
+  border-color: #2d70b3;
+  background: #f8fafc;
+}
+.blank-dock-gutter {
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-right: 1px dashed #cbd5e1;
+  flex-shrink: 0;
+}
+.sidebar-blank-dock:hover .blank-dock-gutter {
+  border-right-color: #2d70b3;
+}
+.faint-next-index {
+  font-size: 13px;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+.sidebar-blank-dock:hover .faint-next-index {
+  color: #2d70b3;
+}
+.blank-dock-body {
+  flex: 1;
+}
+
+/* Style Popover */
+.style-popover {
+  margin-top: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.popover-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.popover-row label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.popover-color-grid {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.popover-color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.popover-color-swatch:hover,
+.popover-color-swatch.selected {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 2px #0f172a;
+}
+.popover-color-custom {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.popover-select {
+  padding: 5px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 11.5px;
+  background: #ffffff;
+}
+
+.popover-range {
+  width: 100%;
+  accent-color: #2d70b3;
+}
+
+.popover-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.popover-input-sm {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 11.5px;
+}
+
+.popover-done-btn {
+  margin-top: 4px;
+  padding: 5px 0;
+  border: none;
+  background: #2d70b3;
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   RIGHT GRAPHPAPER CANVAS AREA
+   ========================================================= */
+#graph-container {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  background: #ffffff;
+  cursor: crosshair;
+}
+
+#graph-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Floating Top Controls on Graph */
+.floating-top-bar {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 50;
+}
+
+.dropdown-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 175px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  padding: 5px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.floating-top-bar .menu-dropdown {
+  left: auto;
+  right: 0;
+  min-width: 195px;
+}
+.dark-theme .menu-dropdown {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45);
+}
+
+.menu-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #334155;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+.menu-item-btn:hover {
+  background: #f1f5f9;
+  color: #2d70b3;
+}
+.dark-theme .menu-item-btn {
+  color: #cbd5e1;
+}
+.dark-theme .menu-item-btn:hover {
+  background: #334155;
+  color: #38bdf8;
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.glass-btn:hover {
+  background: #ffffff;
+  color: #2d70b3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09);
+  transform: translateY(-1px);
+}
+
+/* Floating Bottom Zoom Controls */
+.floating-zoom-bar {
+  position: absolute;
+  bottom: 24px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  z-index: 50;
+}
+
+.zoom-btn {
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: #ffffff;
+  color: #334155;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.zoom-btn:hover {
+  background: #f1f5f9;
+  color: #2d70b3;
+}
+.zoom-btn:not(:last-child) {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* =========================================================
+   MODAL DIALOGS (CAS & PRESETS)
+   ========================================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.modal-card {
+  width: 440px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.modal-row label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+}
+.modal-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+}
+.modal-input:focus {
+  border-color: #2d70b3;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+.modal-btn.primary {
+  background: #2d70b3;
+  color: #ffffff;
+}
+.modal-btn.primary:hover {
+  background: #23588d;
+}
+.modal-btn.secondary {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.modal-output-box {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0f172a;
+  min-height: 40px;
+  word-break: break-all;
+}
+
+/* Preset Cards */
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.preset-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+.preset-card:hover {
+  border-color: #2d70b3;
+  box-shadow: 0 4px 12px rgba(45, 112, 179, 0.12);
+  transform: translateY(-2px);
+}
+.preset-card strong {
+  display: block;
+  font-size: 13px;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.preset-card p {
+  margin: 0;
+  font-size: 11px;
+  color: #64748b;
+  font-family: monospace;
+}
+
+/* =========================================================
+   EXPRESSION NOTES / COMMENTS STYLING
+   ========================================================= */
+.expr-card.is-note {
+  background: #fdfdfd;
+  border-left: 3px solid #64748b;
+}
+
+.expr-card.is-note .expr-input {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: #334155;
+}
+
+.expr-note-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  width: 20px;
+  height: 20px;
+}
+
+/* =========================================================
+   EDITABLE SLIDER BOUNDS
+   ========================================================= */
+.slider-bound {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  border-bottom: 1px dashed #cbd5e1;
+  padding: 1px 3px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+.slider-bound:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-bottom-color: #2d70b3;
+}
+
+.slider-bound-input {
+  width: 44px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #2d70b3;
+  border-radius: 3px;
+  padding: 1px 3px;
+  outline: none;
+}
+
+/* =========================================================
+   GRAPH SETTINGS / WRENCH STYLES
+   ========================================================= */
+.setting-toggle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.setting-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+}
+.setting-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #2d70b3;
+  cursor: pointer;
+}
+
+.angle-btn-group {
+  display: flex;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ffffff;
+}
+.angle-opt {
+  flex: 1;
+  padding: 7px 0;
+  border: none;
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.angle-opt.active {
+  background: #2d70b3;
+  color: #ffffff;
+}
+
+.bounds-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bounds-input-row span {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* =========================================================
+   IN-LINE CAS & MATH AUTOCOMPLETE POPUP
+   ========================================================= */
+.suggestions-popover {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  width: 310px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.1s;
+}
+.suggestion-item:hover,
+.suggestion-item.selected {
+  background: #eff6ff;
+}
+
+.sugg-left {
+  display: flex;
+  flex-direction: column;
+}
+.sugg-text {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1e293b;
+}
+.sugg-desc {
+  font-size: 11px;
+  color: #64748b;
+}
+.sugg-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* =========================================================
+   DISCRETE ACTION TOOLS (TABLE, DAC, DTFT, METRICS)
+   ========================================================= */
+.card-discrete-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.btn-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-card-action svg {
+  flex-shrink: 0;
+}
+.btn-card-action:hover {
+  background: #e2e8f0;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+.btn-card-action.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #2d70b3;
+}
+
+.badge-metrics {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-family: monospace;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+/* =========================================================
+   DATA TABLE & DTFT MODALS
+   ========================================================= */
+.table-actions-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.mini-btn {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mini-btn:hover {
+  background: #eff6ff;
+  border-color: #2d70b3;
+  color: #1d4ed8;
+}
+
+.table-scroll-box {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.samples-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: monospace;
+  font-size: 12px;
+}
+.samples-table th {
+  background: #f1f5f9;
+  padding: 6px 12px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #cbd5e1;
+}
+.samples-table td {
+  padding: 5px 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.samples-table tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.dtft-metrics-row {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* =========================================================
+   FOLDERS STYLING
+   ========================================================= */
+.expr-card.is-folder {
+  background: #f1f5f9;
+  border-left: 4px solid #2d70b3;
+}
+.expr-card.is-folder .expr-input {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* =========================================================
+   DARK MODE / MIDNIGHT THEME
+   ========================================================= */
+body.dark-theme {
+  background: #0f172a;
+  color: #f8fafc;
+}
+body.dark-theme #sidebar {
+  background: #0b1120;
+  border-right-color: #1e293b;
+}
+body.dark-theme .desmos-header {
+  background: #0f172a;
+  border-bottom-color: #1e293b;
+}
+body.dark-theme .desmos-brand {
+  color: #60a5fa;
+}
+body.dark-theme .desmos-nav-icon-btn {
+  color: #94a3b8;
+}
+body.dark-theme .desmos-nav-icon-btn:hover {
+  background: #1e293b;
+  color: #f8fafc;
+}
+body.dark-theme .sidebar-scroll {
+  background: #0b1120;
+}
+body.dark-theme .sidebar-blank-dock {
+  color: #64748b;
+}
+body.dark-theme .sidebar-blank-dock:hover {
+  background: #152033;
+}
+body.dark-theme .expr-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .expr-gutter {
+  background: #152033;
+  border-right-color: #334155;
+}
+body.dark-theme .expr-card.active-card .expr-gutter,
+body.dark-theme .expr-card:focus-within .expr-gutter {
+  background: #3b82f6 !important;
+  border-right-color: #3b82f6 !important;
+}
+body.dark-theme .expr-card.active-card,
+body.dark-theme .expr-card:focus-within {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+}
+body.dark-theme .mq-editable-field {
+  color: #f8fafc !important;
+}
+body.dark-theme .mq-cursor {
+  border-left-color: #60a5fa !important;
+}
+body.dark-theme .mq-editable-field .mq-fraction .mq-fraction-bar {
+  border-color: #64748b !important;
+}
+body.dark-theme .expr-input {
+  color: #f8fafc;
+}
+body.dark-theme .expr-card.is-note {
+  background: #141f33;
+  border-left-color: #64748b;
+}
+body.dark-theme .expr-card.is-note .expr-input {
+  color: #cbd5e1;
+}
+body.dark-theme .expr-card.is-folder {
+  background: #1e293b;
+  border-left-color: #60a5fa;
+}
+body.dark-theme .expr-card.is-folder .expr-input {
+  color: #f8fafc;
+}
+body.dark-theme .glass-btn {
+  background: rgba(30, 41, 59, 0.88);
+  border-color: #334155;
+  color: #f8fafc;
+}
+body.dark-theme .glass-btn:hover {
+  background: #1e293b;
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+body.dark-theme .floating-zoom-bar {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .zoom-btn {
+  background: #1e293b;
+  color: #f8fafc;
+  border-bottom-color: #334155;
+}
+body.dark-theme .zoom-btn:hover {
+  background: #334155;
+  color: #60a5fa;
+}
+body.dark-theme .modal-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f8fafc;
+}
+body.dark-theme .modal-header {
+  border-bottom-color: #334155;
+}
+body.dark-theme .modal-header h3 {
+  color: #f8fafc;
+}
+body.dark-theme .setting-toggle-group {
+  background: #0f172a;
+  border-color: #334155;
+}
+body.dark-theme .setting-checkbox-label {
+  color: #e2e8f0;
+}
+body.dark-theme .modal-input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+body.dark-theme .angle-btn-group {
+  border-color: #334155;
+  background: #0f172a;
+}
+body.dark-theme .angle-opt {
+  color: #94a3b8;
+}
+body.dark-theme .angle-opt.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+body.dark-theme .suggestions-popover {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .suggestion-item {
+  border-bottom-color: #334155;
+}
+body.dark-theme .suggestion-item:hover,
+body.dark-theme .suggestion-item.selected {
+  background: #334155;
+}
+body.dark-theme .sugg-text {
+  color: #f8fafc;
+}
+body.dark-theme .sugg-desc {
+  color: #94a3b8;
+}
+body.dark-theme .sugg-badge {
+  background: #0f172a;
+  color: #94a3b8;
+}
+body.dark-theme .samples-table th {
+  background: #0f172a;
+  border-bottom-color: #334155;
+  color: #f8fafc;
+}
+body.dark-theme .samples-table td {
+  border-bottom-color: #1e293b;
+  color: #e2e8f0;
+}
+body.dark-theme .samples-table tr:nth-child(even) {
+  background: #141f33;
+}
+body.dark-theme .dtft-metrics-row {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+body.dark-theme .mini-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+body.dark-theme .mini-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* =========================================================
+   EASE OF USE: ADD SLIDER PROMPT, DIAGNOSTICS, REORDERING & KEYPAD
+   ========================================================= */
+
+/* 1. Desmos-Style Add Slider Prompt */
+.add-slider-prompt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 8px 44px;
+  background: #f8fafc;
+  border-top: 1px dashed #e2e8f0;
+  font-size: 13px;
+  animation: fadeIn 0.15s ease;
+}
+.add-slider-label {
+  color: #64748b;
+  font-size: 12.5px;
+  font-style: italic;
+  font-weight: 500;
+}
+.add-slider-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12.5px;
+  font-family: inherit;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: all 0.12s ease;
+}
+.add-slider-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+}
+.add-slider-btn.btn-slider-all {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.add-slider-btn.btn-slider-all:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* 2. Expression Diagnostic Badges & Tooltips */
+.expr-diag-badge {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.12s ease;
+}
+.expr-diag-badge.is-warning {
+  color: #d97706;
+}
+.expr-diag-badge.is-error {
+  color: #dc2626;
+}
+.expr-diag-badge:hover {
+  transform: scale(1.15);
+  background: rgba(0,0,0,0.04);
+}
+.expr-diag-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 44px;
+  right: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  z-index: 150;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeIn 0.15s ease;
+}
+.diag-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+}
+.diag-entry.warning .diag-msg {
+  color: #b45309;
+}
+.diag-entry.error .diag-msg {
+  color: #b91c1c;
+  font-weight: 500;
+}
+.btn-diag-fix {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+.btn-diag-fix:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* 3. Card Drag and Drop Reordering */
+.expr-card.is-dragging {
+  opacity: 0.4;
+  border: 2px dashed #2563eb !important;
+  background: #f1f5f9;
+}
+.expr-card.drop-above {
+  border-top: 3px solid #2563eb !important;
+}
+.expr-card.drop-below {
+  border-bottom: 3px solid #2563eb !important;
+}
+.expr-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  color: #94a3b8;
+  margin-right: 2px;
+  transition: color 0.12s ease;
+}
+.expr-gutter:hover .expr-drag-handle {
+  color: #475569;
+}
+.expr-move-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.expr-move-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 1px 2px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.expr-move-btn:hover {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+/* 4. Virtual Math Keypad */
+.keypad-toggle-btn {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.15s ease;
+}
+.keypad-toggle-btn:hover,
+.keypad-toggle-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+#virtual-keypad {
+  position: fixed;
+  bottom: -290px;
+  left: 0;
+  right: 0;
+  height: 280px;
+  background: #ffffff;
+  border-top: 1.5px solid #cbd5e1;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  transition: bottom 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+#virtual-keypad.open {
+  bottom: 0;
+}
+
+body.keypad-open #sidebar-scroll-area {
+  padding-bottom: 280px;
+}
+
+.keypad-header {
+  height: 38px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.keypad-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.keypad-tab-btn {
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.keypad-tab-btn:hover {
+  color: #1e293b;
+  background: #e2e8f0;
+}
+.keypad-tab-btn.active {
+  background: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.keypad-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.keypad-close-btn:hover {
+  color: #1e293b;
+  background: #e2e8f0;
+}
+
+.keypad-body {
+  flex: 1;
+  padding: 10px 16px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+.keypad-panel {
+  display: none;
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+}
+.keypad-panel.active {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.keypad-row {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+.keypad-btn {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #1e293b;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  transition: all 0.1s ease;
+  min-width: 32px;
+}
+.keypad-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+.keypad-btn:active {
+  background: #e2e8f0;
+  transform: translateY(0);
+}
+.keypad-btn.num-key {
+  font-weight: 700;
+  font-size: 16px;
+}
+.keypad-btn.op-key {
+  background: #f8fafc;
+  color: #2563eb;
+  font-weight: 600;
+}
+.keypad-btn.action-key {
+  background: #f1f5f9;
+  color: #475569;
+}
+.keypad-btn.enter-key {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+  font-weight: 600;
+}
+.keypad-btn.enter-key:hover {
+  background: #1d4ed8;
+}

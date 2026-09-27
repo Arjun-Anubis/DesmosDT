@@ -1,0 +1,22 @@
+{
+  "name": "omnigraph",
+  "version": "2.0.0",
+  "description": "High-performance Desmos-grade graphing calculator & discrete-time DSP laboratory with symbolic CAS and complex arithmetic",
+  "main": "js/cas_math.js",
+  "scripts": {
+    "start": "node serve.js",
+    "test": "node tests/run_all.js"
+  },
+  "keywords": [
+    "graphing-calculator",
+    "desmos",
+    "discrete-time",
+    "signals-and-systems",
+    "cas",
+    "symbolic-math",
+    "canvas",
+    "dsp"
+  ],
+  "author": "",
+  "license": "MIT"
+}
